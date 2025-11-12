@@ -762,6 +762,10 @@ jobs:
         uses: geekyeggo/delete-artifact@v5
         with:
           name: digests-*
+      - name: Cleanup Docker 2
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: "*.dockerbuild"
       - name: Cleanup Pages
         uses: geekyeggo/delete-artifact@v5
         with:
