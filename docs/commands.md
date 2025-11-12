@@ -1107,7 +1107,7 @@ server mod search <mod-name> <version>
     > specifics
     name                version   url
     hmc-specifics       2.2.1     https://github.com/headlesshq/hmc-specifics/releases/download/
-    mc-runtime-test     3.1.1     https://github.com/headlesshq/mc-runtime-test/releases/download/
+    mc-runtime-test     4.1.0     https://github.com/headlesshq/mc-runtime-test/releases/download/
     hmc-optimizations   0.4.0     https://github.com/headlesshq/hmc-optimizations/releases/download/
 
     > specifics fabric:1.21.5 hmc-specifics
