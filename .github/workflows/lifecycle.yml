@@ -767,6 +767,11 @@ jobs:
         with:
           name: github-pages*
           failOnError: false
+      - name: Cleanup mc-runtime-test
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: mcrt-*
+          failOnError: false
       - name: Merge Artifacts
         uses: actions/upload-artifact/merge@v4
         with:
