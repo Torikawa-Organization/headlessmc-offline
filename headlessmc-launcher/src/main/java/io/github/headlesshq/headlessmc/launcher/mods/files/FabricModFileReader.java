@@ -1,8 +1,8 @@
 package io.github.headlesshq.headlessmc.launcher.mods.files;
 
 import com.google.gson.annotations.SerializedName;
-import lombok.Data;
 import io.github.headlesshq.headlessmc.launcher.util.JsonUtil;
+import lombok.Data;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -47,8 +46,8 @@ public class FabricModFileReader implements ModFileReader {
         private final String description;
         @SerializedName("authors")
         private final List<String> authors;
-        @SerializedName("depends")
-        private final Map<String, String> depends;
+        //@SerializedName("depends") // not sed rn
+        //private final Map<String, String> depends; <- TODO: could also be Map<String, List<String>> or something
     }
 
 }
