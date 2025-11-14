@@ -291,6 +291,11 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
+        env:
+          # Needed for Windows; to resolve issue with temp folder during native image build, due to relativization
+          # problem when different drives are used, such as in GHA runners.
+          # https://github.com/graalvm/native-build-tools/issues/754
+          GRADLE_OPTS: -Djava.io.tmpdir=${{ runner.temp }}
         run: |
           ./gradlew -Phmc_graal_executable=${{ matrix.os.name }} -Phmc_graal_build=true headlessmc-graalvm:nativeCompile
 
