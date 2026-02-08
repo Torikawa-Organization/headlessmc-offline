@@ -1,34 +1,39 @@
 package io.github.headlesshq.headlessmc.launcher.command;
 
-import lombok.CustomLog;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.jetbrains.annotations.Nullable;
+
 import io.github.headlesshq.headlessmc.api.command.CommandException;
+import io.github.headlesshq.headlessmc.auth.ValidatedAccount;
 import io.github.headlesshq.headlessmc.launcher.Launcher;
 import io.github.headlesshq.headlessmc.launcher.LauncherProperties;
 import io.github.headlesshq.headlessmc.launcher.auth.AuthException;
 import io.github.headlesshq.headlessmc.launcher.auth.LaunchAccount;
-import io.github.headlesshq.headlessmc.auth.ValidatedAccount;
 import io.github.headlesshq.headlessmc.launcher.command.download.AbstractDownloadingVersionCommand;
 import io.github.headlesshq.headlessmc.launcher.launch.LaunchException;
 import io.github.headlesshq.headlessmc.launcher.launch.LaunchOptions;
 import io.github.headlesshq.headlessmc.launcher.version.Version;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import lombok.CustomLog;
 
 @CustomLog
 public class LaunchCommand extends AbstractDownloadingVersionCommand {
     public LaunchCommand(Launcher launcher) {
         super(launcher, "launch", "Launches the game.");
-        args.put("<version/id>", "Name or id of the version to launch. If you use the id you need to use the -id flag as well.");
+        args.put("<version/id>",
+                "Name or id of the version to launch. If you use the id you need to use the -id flag as well.");
         args.put("-id", "Use if you specified an id instead of a version name.");
         args.put("-commands", "Starts the game with the built-in command line support.");
         args.put("-lwjgl", "Removes lwjgl code, causing Minecraft not to render anything.");
         args.put("-inmemory", "Launches the game in the same JVM headlessmc is running in.");
         args.put("-jndi", "Patches the Log4J vulnerability.");
         args.put("-lookup", "Patches the Log4J vulnerability even harder.");
-        args.put("-paulscode", "Removes some error messages from the PaulsCode library which may annoy you if you started the game with the -lwjgl flag.");
+        args.put("-paulscode",
+                "Removes some error messages from the PaulsCode library which may annoy you if you started the game with the -lwjgl flag.");
+        args.put("-noAuth",
+                "Patches Mojang's authlib to skip session server authentication, allowing offline/invalid accounts to join servers.");
         args.put("-noout", "Doesn't print Minecrafts output to the console."); // TODO: is this really necessary?
         args.put("-quit", "Quit HeadlessMc after launching the game.");
         args.put("-offline", "Launch Mc in offline mode.");
@@ -58,7 +63,8 @@ public class LaunchCommand extends AbstractDownloadingVersionCommand {
 
         @Override
         protected Path getGameDir() {
-            return Paths.get(ctx.getConfig().get(LauncherProperties.GAME_DIR, ctx.getGameDir(version).getPath())).toAbsolutePath();
+            return Paths.get(ctx.getConfig().get(LauncherProperties.GAME_DIR, ctx.getGameDir(version).getPath()))
+                    .toAbsolutePath();
         }
 
         @Override
@@ -72,8 +78,7 @@ public class LaunchCommand extends AbstractDownloadingVersionCommand {
                             .closeCommandLine(!prepare)
                             .parseFlags(ctx, quit, args)
                             .prepare(prepare)
-                            .build()
-            );
+                            .build());
         }
     }
 

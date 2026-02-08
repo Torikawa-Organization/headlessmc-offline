@@ -1,10 +1,13 @@
 package io.github.headlesshq.headlessmc.launcher;
 
+import static io.github.headlesshq.headlessmc.api.config.PropertyTypes.array;
+import static io.github.headlesshq.headlessmc.api.config.PropertyTypes.bool;
+import static io.github.headlesshq.headlessmc.api.config.PropertyTypes.number;
+import static io.github.headlesshq.headlessmc.api.config.PropertyTypes.string;
+
 import io.github.headlesshq.headlessmc.api.config.HmcProperties;
 import io.github.headlesshq.headlessmc.api.config.Property;
 import io.github.headlesshq.headlessmc.launcher.files.ConfigService;
-
-import static io.github.headlesshq.headlessmc.api.config.PropertyTypes.*;
 
 /**
  * Properties used by the launcher. These can be set as SystemProperties or in
@@ -41,6 +44,9 @@ public interface LauncherProperties extends HmcProperties {
     Property<Boolean> ALWAYS_QUIT_FLAG = bool("hmc.always.quit.flag");
     Property<Boolean> ALWAYS_JNDI_FLAG = bool("hmc.always.jndi.flag");
     Property<Boolean> ALWAYS_LOOKUP_FLAG = bool("hmc.always.lookup.flag");
+
+    Property<Boolean> INVERT_NO_AUTH_FLAG = bool("hmc.invert.noauth.flag");
+    Property<Boolean> ALWAYS_NO_AUTH_FLAG = bool("hmc.always.noauth.flag");
 
     Property<Boolean> JOML_NO_UNSAFE = bool("hmc.joml.no.unsafe");
 

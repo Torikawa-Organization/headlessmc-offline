@@ -1,15 +1,16 @@
 package io.github.headlesshq.headlessmc.launcher.instrumentation;
 
-import lombok.CustomLog;
-import lombok.experimental.UtilityClass;
-import lombok.val;
+import java.util.ArrayList;
+
 import io.github.headlesshq.headlessmc.launcher.instrumentation.log4j.Patchers;
 import io.github.headlesshq.headlessmc.launcher.instrumentation.lwjgl.HmcLwjglTransformer;
 import io.github.headlesshq.headlessmc.launcher.instrumentation.modlauncher.BootstrapLauncherTransformer;
+import io.github.headlesshq.headlessmc.launcher.instrumentation.offline.YggdrasilSessionPatcher;
 import io.github.headlesshq.headlessmc.launcher.instrumentation.paulscode.PaulscodeTransformer;
 import io.github.headlesshq.headlessmc.launcher.launch.LaunchOptions;
-
-import java.util.ArrayList;
+import lombok.CustomLog;
+import lombok.val;
+import lombok.experimental.UtilityClass;
 
 @CustomLog
 @UtilityClass
@@ -38,6 +39,10 @@ public class InstrumentationHelper {
 
         if (options.isLookup()) {
             transformers.add(Patchers.LOOKUP);
+        }
+
+        if (options.isNoAuth()) {
+            transformers.add(new YggdrasilSessionPatcher());
         }
 
         if (options.isInMemory()) {

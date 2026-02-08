@@ -1,21 +1,34 @@
 package io.github.headlesshq.headlessmc.launcher.launch;
 
-import lombok.Builder;
-import lombok.CustomLog;
-import lombok.Data;
-import io.github.headlesshq.headlessmc.api.command.CommandUtil;
-import io.github.headlesshq.headlessmc.launcher.Launcher;
-import io.github.headlesshq.headlessmc.launcher.auth.LaunchAccount;
-import io.github.headlesshq.headlessmc.launcher.files.FileManager;
-import io.github.headlesshq.headlessmc.launcher.version.Version;
+import static io.github.headlesshq.headlessmc.api.command.CommandUtil.flag;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.ALWAYS_IN_MEMORY;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.ALWAYS_JNDI_FLAG;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.ALWAYS_LOOKUP_FLAG;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.ALWAYS_LWJGL_FLAG;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.ALWAYS_NO_AUTH_FLAG;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.ALWAYS_PAULS_FLAG;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.AUTO_DOWNLOAD_SPECIFICS;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.INVERT_JNDI_FLAG;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.INVERT_LOOKUP_FLAG;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.INVERT_LWJGL_FLAG;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.INVERT_NO_AUTH_FLAG;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.INVERT_PAULS_FLAG;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.SERVER_TEST;
+import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.TEST_FILE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static io.github.headlesshq.headlessmc.api.command.CommandUtil.flag;
-import static io.github.headlesshq.headlessmc.launcher.LauncherProperties.*;
+import io.github.headlesshq.headlessmc.api.command.CommandUtil;
+import io.github.headlesshq.headlessmc.launcher.Launcher;
+import io.github.headlesshq.headlessmc.launcher.auth.LaunchAccount;
+import io.github.headlesshq.headlessmc.launcher.files.FileManager;
+import io.github.headlesshq.headlessmc.launcher.version.Version;
+import lombok.Builder;
+import lombok.CustomLog;
+import lombok.Data;
 
 @Data
 @Builder
@@ -33,6 +46,7 @@ public class LaunchOptions {
     private final boolean jndi;
     private final boolean lookup;
     private final boolean paulscode;
+    private final boolean noAuth;
     private final boolean noOut;
     private final boolean noIn;
     private final boolean inMemory;
@@ -51,14 +65,15 @@ public class LaunchOptions {
         }
 
         public LaunchOptionsBuilder parseFlags(
-            Launcher ctx, boolean quit, String... args) {
+                Launcher ctx, boolean quit, String... args) {
             boolean xvfb = false;
             boolean lwjgl = false;
             if (!server) {
                 lwjgl = flag(ctx, "-lwjgl", INVERT_LWJGL_FLAG, ALWAYS_LWJGL_FLAG, args);
                 // if offline only allow launching with the lwjgl flag!
                 if (!lwjgl && launcher.getAccountManager().getOfflineChecker().isOffline()) {
-                    xvfb = new XvfbService(launcher.getConfigService(), launcher.getProcessFactory().getOs()).isRunningWithXvfb();
+                    xvfb = new XvfbService(launcher.getConfigService(), launcher.getProcessFactory().getOs())
+                            .isRunningWithXvfb();
                     if (!xvfb) {
                         log.warning("You are offline, game will start in headless mode!");
                         lwjgl = true;
@@ -71,7 +86,7 @@ public class LaunchOptions {
             boolean noOut = quit || CommandUtil.hasFlag("-noout", args);
             boolean noIn = quit;
             if (launcher.getConfig().get(SERVER_TEST, false)
-                || launcher.getConfig().get(TEST_FILE, null) != null) {
+                    || launcher.getConfig().get(TEST_FILE, null) != null) {
                 noOut = true;
                 noIn = true;
             }
@@ -80,20 +95,22 @@ public class LaunchOptions {
                     || launcher.getConfig().get(AUTO_DOWNLOAD_SPECIFICS, false);
 
             return this
-                .runtime(CommandUtil.hasFlag("-commands", args))
-                .specifics(specifics)
-                .lwjgl(lwjgl)
-                .inMemory(CommandUtil.hasFlag("-inmemory", args) || launcher.getConfig().get(ALWAYS_IN_MEMORY, false))
-                .jndi(flag(ctx, true, "-jndi", INVERT_JNDI_FLAG, ALWAYS_JNDI_FLAG, args))
-                .lookup(flag(ctx, true, "-lookup", INVERT_LOOKUP_FLAG, ALWAYS_LOOKUP_FLAG, args))
-                .paulscode(flag(ctx, "-paulscode", INVERT_PAULS_FLAG, ALWAYS_PAULS_FLAG, args))
-                .noOut(noOut)
-                .forceSimple(CommandUtil.hasFlag("-forceSimple", args))
-                .forceBoot(CommandUtil.hasFlag("-forceBoot", args))
-                .parseJvmArgs(args)
-                .parseGameArgs(args)
-                .xvfb(xvfb)
-                .noIn(noIn);
+                    .runtime(CommandUtil.hasFlag("-commands", args))
+                    .specifics(specifics)
+                    .lwjgl(lwjgl)
+                    .inMemory(
+                            CommandUtil.hasFlag("-inmemory", args) || launcher.getConfig().get(ALWAYS_IN_MEMORY, false))
+                    .jndi(flag(ctx, true, "-jndi", INVERT_JNDI_FLAG, ALWAYS_JNDI_FLAG, args))
+                    .lookup(flag(ctx, true, "-lookup", INVERT_LOOKUP_FLAG, ALWAYS_LOOKUP_FLAG, args))
+                    .paulscode(flag(ctx, "-paulscode", INVERT_PAULS_FLAG, ALWAYS_PAULS_FLAG, args))
+                    .noAuth(flag(ctx, "-noAuth", INVERT_NO_AUTH_FLAG, ALWAYS_NO_AUTH_FLAG, args))
+                    .noOut(noOut)
+                    .forceSimple(CommandUtil.hasFlag("-forceSimple", args))
+                    .forceBoot(CommandUtil.hasFlag("-forceBoot", args))
+                    .parseJvmArgs(args)
+                    .parseGameArgs(args)
+                    .xvfb(xvfb)
+                    .noIn(noIn);
         }
 
         public LaunchOptionsBuilder parseJvmArgs(String... args) {
