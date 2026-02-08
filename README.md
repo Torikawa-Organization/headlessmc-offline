@@ -4,7 +4,10 @@ It's HeadlessMc, but patched for using offline accounts on servers. For further 
 
 ## `-noAuth` Flag
 
-The `-noAuth` flag patches Mojang's `authlib` at launch time so that offline or invalid accounts can join multiplayer servers. It works by replacing `YggdrasilMinecraftSessionService.joinServer()` with a no-op, preventing the client from sending an authentication request to Mojang's session servers.
+The `-noAuth` flag patches Mojang's `authlib` at launch time so that offline or invalid accounts can join multiplayer servers. It applies two patches:
+
+1. **`YggdrasilMinecraftSessionService.joinServer()`** is replaced with a no-op, preventing the client from sending an authentication request to Mojang's session servers.
+2. **`YggdrasilUserApiService.getKeyPair()`** is patched to return `null`, preventing a `401` error when the client tries to retrieve profile key pairs for chat signing.
 
 ### Usage
 
@@ -28,6 +31,8 @@ To enable it permanently, set one of the following properties in your config:
 ### How It Works
 
 Normally, when a Minecraft client connects to a server, it calls `joinServer()` to authenticate with Mojang's session servers. This fails with a `401` for offline/invalid accounts and prevents the connection. The `-noAuth` flag uses bytecode instrumentation (ASM) to replace the body of that method with a simple `return`, so the client proceeds with the connection without authenticating.
+
+Additionally, Minecraft calls `getKeyPair()` to fetch profile key pairs used for chat signing. For offline/invalid accounts this also results in a `401` error. The patch makes `getKeyPair()` return `null`, which the client handles gracefully by skipping chat signing.
 
 ### Important Notes
 
