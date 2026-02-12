@@ -2,6 +2,13 @@
 
 It's HeadlessMc, but patched for using offline accounts on servers. For further information about HeadlessMc, see the [upstream repository](https://github.com/headlesshq/headlessmc).
 
+## Why?
+
+We are building a Minecraft Bot Swarm system to be used on servers like 6b6t.
+As we need to have a lot of bots running at the same time, we want to rely on HeadlessMc in [our runtime](https://github.com/Torikawa-Organization/SwarmRuntime).
+However, HeadlessMc does not support offline accounts, which are essential for our use case.
+This project is a fork of HeadlessMc that adds support for offline accounts by patching Mojang's `authlib` at launch time.
+
 ## `-noAuth` Flag
 
 The `-noAuth` flag patches Mojang's `authlib` at launch time so that offline or invalid accounts can join multiplayer servers. It applies two patches:
