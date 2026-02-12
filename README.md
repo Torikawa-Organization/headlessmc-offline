@@ -9,6 +9,10 @@ As we need to have a lot of bots running at the same time, we want to rely on He
 However, HeadlessMc does not support offline accounts, which are essential for our use case.
 This project is a fork of HeadlessMc that adds support for offline accounts by patching Mojang's `authlib` at launch time.
 
+## ⚠️ DISCLAIMER ABOUT ISSUES ⚠️
+
+We patch HeadlessMc's code. So if you encounter any errors, please first confirm that the error is not caused by our patches. You can do this by trying to do whatever you were doing with the upstream version of HeadlessMc. If the error does **NOT** occur with the upstream version, please do **NOT** bother the maintainers of the upstream repository with the issue! Instead, please report the issue to us by opening a new issue in this repository. We will investigate and fix the issue if it is caused by our patches.
+
 ## `-noAuth` Flag
 
 The `-noAuth` flag patches Mojang's `authlib` at launch time so that offline or invalid accounts can join multiplayer servers. It applies two patches:
