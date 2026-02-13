@@ -44,6 +44,20 @@ public class STBTrueTypeRedirections {
             + "stbtt_GetNumberOfFonts(Ljava/nio/ByteBuffer;)I";
 
     /**
+     * Descriptor for stbtt_ScaleForPixelHeight(STBTTFontinfo, float) -> float.
+     */
+    public static final String SCALE_FOR_PIXEL_HEIGHT_DESC = "Lorg/lwjgl/stb/STBTruetype;"
+            + "stbtt_ScaleForPixelHeight(Lorg/lwjgl/stb/STBTTFontinfo;F)F";
+
+    /**
+     * Descriptor for stbtt_GetFontVMetrics(STBTTFontinfo, IntBuffer, IntBuffer,
+     * IntBuffer) -> void.
+     */
+    public static final String GET_FONT_VMETRICS_DESC = "Lorg/lwjgl/stb/STBTruetype;"
+            + "stbtt_GetFontVMetrics(Lorg/lwjgl/stb/STBTTFontinfo;"
+            + "Ljava/nio/IntBuffer;Ljava/nio/IntBuffer;Ljava/nio/IntBuffer;)V";
+
+    /**
      * Stores parsed name records keyed by the STBTTFontinfo instance.
      * WeakHashMap so entries are cleaned up when fontInfo is GCd.
      */
@@ -111,6 +125,32 @@ public class STBTrueTypeRedirections {
 
         // Return 1 for a single font (most .ttf files).
         manager.redirect(GET_NUMBER_OF_FONTS_DESC, of(1));
+
+        // Return a non-zero scale factor so that callers don't get 0.0f
+        // which could cause division-by-zero issues.
+        manager.redirect(SCALE_FOR_PIXEL_HEIGHT_DESC,
+                (obj, desc, type, args) -> {
+                    float pixelHeight = (float) args[1];
+                    // A typical font might have unitsPerEm=2048, so scale
+                    // is pixelHeight / unitsPerEm. Return a plausible value.
+                    return pixelHeight / 2048.0f;
+                });
+
+        // Fill the ascent/descent/lineGap IntBuffers with plausible values.
+        manager.redirect(GET_FONT_VMETRICS_DESC,
+                (obj, desc, type, args) -> {
+                    java.nio.IntBuffer ascent = (java.nio.IntBuffer) args[1];
+                    java.nio.IntBuffer descent = (java.nio.IntBuffer) args[2];
+                    java.nio.IntBuffer lineGap = (java.nio.IntBuffer) args[3];
+                    // Typical values for a 2048 unitsPerEm font
+                    if (ascent != null)
+                        ascent.put(0, 1800);
+                    if (descent != null)
+                        descent.put(0, -400);
+                    if (lineGap != null)
+                        lineGap.put(0, 0);
+                    return null;
+                });
     }
 
     /**

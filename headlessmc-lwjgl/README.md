@@ -11,7 +11,7 @@ or as a LaunchWrapper Tweaker.
 If you want to do that you also need to add the system property
 `-Djoml.nounsafe=true` to your game, and, if you are
 running on fabric, the path to the headlessmc-lwjgl
-agent jar to the system property `fabric.systemLibraries`.  
+agent jar to the system property `fabric.systemLibraries`.
 
 The transformer will transform every `org.lwjgl`class in the following way:
 Every method body will be replaced with a call to the RedirectionAPI:
@@ -24,7 +24,7 @@ public <type> method(<arg>... args) {
 
 The RedirectionApi can return a default value for all
 datatypes except abstract classes (interfaces will be implemented
-using `java.lang.reflect.Proxy`), 
+using `java.lang.reflect.Proxy`),
 we can also redirect a call manually like this:
 
 ```java
@@ -33,7 +33,7 @@ RedirectionApi.getRedirectionManager().redirect("<owner>;method(<arg.type>)<type
 
 These custom redirections are needed in some
 cases to ensure that the game does not crash.
-E.g. for all methods returning Buffers, 
+E.g. for all methods returning Buffers,
 as those classes cannot be instantiated easily.
 All redirections can be found in the
 [redirections package](src/main/java/io/github/headlesshq/headlessmc/lwjgl/redirections).
@@ -63,3 +63,21 @@ class handles this by implementing a pure-Java TrueType name table parser:
   platformID, encodingID, languageID, and nameID, returning the
   raw bytes as a `ByteBuffer` just like the real STB function would.
 - **`stbtt_GetNumberOfFonts`**: Returns `1` (single font).
+- **`stbtt_ScaleForPixelHeight`**: Returns a plausible scale factor
+  based on a typical 2048 unitsPerEm font, avoiding division-by-zero.
+- **`stbtt_GetFontVMetrics`**: Fills ascent/descent/lineGap buffers
+  with typical values so font metrics calculations don't get all zeros.
+
+## StructBuffer Generic Type Fix
+
+LWJGL's `StructBuffer<T, SELF>` has `get()` methods that return `T`,
+but due to Java generic type erasure the bytecode return type is the
+base `Struct` class. The default `ObjectRedirection` creates a bare
+`Struct` instance, which causes a `ClassCastException` when callers
+cast to the expected subclass (e.g. `STBTTPackRange`).
+
+The [StructBufferRedirection](src/main/java/io/github/headlesshq/headlessmc/lwjgl/redirections/StructBufferRedirection.java)
+class resolves this by inspecting the generic superclass hierarchy of
+the `StructBuffer` instance at runtime to determine the actual element
+type, then instantiating the correct subclass. Results are cached for
+performance.

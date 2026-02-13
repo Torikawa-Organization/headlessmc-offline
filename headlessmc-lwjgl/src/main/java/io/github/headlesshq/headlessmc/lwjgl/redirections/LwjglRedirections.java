@@ -291,6 +291,7 @@ public class LwjglRedirections {
                 (obj, desc, type, args) -> IntBuffer.wrap(new int[(int) args[1]]));
 
         CustomBufferRedirection.redirect(manager);
+        StructBufferRedirection.redirect(manager);
 
         // 1.20.1
         ForgeDisplayWindowRedirections.redirect(manager);
