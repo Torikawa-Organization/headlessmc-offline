@@ -44,3 +44,22 @@ manager.redirect("Lorg/lwjgl/BufferUtils;createFloatBuffer(I)"Ljava/nio/FloatBuf
                          (obj, desc, type, args) -> FloatBuffer.wrap(
                              new float[(int) args[0]]));
 ```
+
+## STB TrueType Font Support
+
+Some mods (e.g. Meteor Client) use LWJGL's STB TrueType bindings
+(`org.lwjgl.stb.STBTruetype`) to load and inspect `.ttf` font files.
+Since the transformer replaces all `org.lwjgl` method bodies,
+the native STB font parsing functions are unavailable in headless mode.
+
+The [STBTrueTypeRedirections](src/main/java/io/github/headlesshq/headlessmc/lwjgl/redirections/stb/STBTrueTypeRedirections.java)
+class handles this by implementing a pure-Java TrueType name table parser:
+
+- **`stbtt_InitFont`**: Parses the TrueType/OpenType `name` table from
+  the raw font `ByteBuffer` and caches all name records
+  (family name, style, etc.) keyed by the `STBTTFontinfo` instance.
+  Returns `true` to indicate success.
+- **`stbtt_GetFontNameString`**: Looks up cached name records by
+  platformID, encodingID, languageID, and nameID, returning the
+  raw bytes as a `ByteBuffer` just like the real STB function would.
+- **`stbtt_GetNumberOfFonts`**: Returns `1` (single font).
